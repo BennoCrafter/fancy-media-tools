@@ -19,13 +19,9 @@ function ChangeCapture() {
   const [isMuted, setIsMuted] = useState(true)
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
-  const [subtitleText, setSubtitleText] = useState('')
-  const [captionStyleId, setCaptionStyleId] = useState('netflix')
-  const [fontScale, setFontScale] = useState(1)
 
-  const [isUploadingFont, setIsUploadingFont] = useState(false)
+
   const inputRef = useRef<HTMLInputElement>(null)
-  const fontUploadRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imageRef = useRef<HTMLImageElement | null>(null)
