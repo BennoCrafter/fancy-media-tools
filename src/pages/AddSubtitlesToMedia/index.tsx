@@ -13,7 +13,7 @@ import SubtitleControlsPanel from './SubtitleControlsPanel'
 
 function AddSubtitlesToMedia() {
   const [file, setFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [prevFile, setPrevFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isInvalidDrag, setIsInvalidDrag] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -38,15 +38,24 @@ function AddSubtitlesToMedia() {
   const allFontOptions = useMemo(() => [...FONT_OPTIONS, ...customFonts], [customFonts])
   const activeFont = allFontOptions.find((f) => f.id === fontId) ?? FONT_OPTIONS[0]
 
+  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file])
+
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
     }
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [file])
+  }, [previewUrl])
+
+  // Reset transient playback state synchronously during render when the file prop
+  // changes, per https://react.dev/learn/you-might-not-need-an-effect — avoids the
+  // extra commit an effect-based reset would cause.
+  if (file !== prevFile) {
+    setPrevFile(file)
+    setIsPlaying(false)
+    setDuration(0)
+    setCurrentTime(0)
+    setIsMuted(true)
+  }
 
   useEffect(() => {
     Promise.all(FONT_OPTIONS.map((f) => document.fonts.load(`${f.weight} 16px "${f.family}"`))).catch(
@@ -104,10 +113,6 @@ function AddSubtitlesToMedia() {
   useEffect(() => stopVideoLoop, [stopVideoLoop])
 
   useEffect(() => {
-    setIsPlaying(false)
-    setDuration(0)
-    setCurrentTime(0)
-    setIsMuted(true)
     imageRef.current = null
     stopVideoLoop()
   }, [file, stopVideoLoop])
