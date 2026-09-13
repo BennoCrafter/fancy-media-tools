@@ -1,9 +1,9 @@
-import Tiles from './components/Tiles'
+import Tiles from '../components/Tiles'
 
 import { useNavigate } from 'react-router-dom';
 import { Subtitles } from 'lucide-react';
 
-export function App() {
+export function Home() {
   const navigate = useNavigate();
 
   return (
@@ -46,4 +46,4 @@ export function App() {
   );
 }
 
-export default App
+export default Home
