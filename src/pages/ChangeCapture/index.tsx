@@ -7,12 +7,9 @@ import VideoPlaybackToolbar from '../../components/VideoPlaybackToolbar'
 import ExportProgressBar from '../../components/ExportProgressBar'
 import { BUTTON_ACCENT, BUTTON_OUTLINE, BUTTON_PRIMARY } from '../../styles/ui'
 import { isHeicFile, isMediaFile } from '../../lib/media'
-import { FONT_OPTIONS, type FontOption } from './constants'
-import { drawSubtitles } from './canvasSubtitles'
 import { useVideoExport } from '../../lib/useVideoExport'
-import SubtitleControlsPanel from './SubtitleControlsPanel'
 
-function AddSubtitlesToMedia() {
+function ChangeCapture() {
   const [file, setFile] = useState<File | null>(null)
   const [prevFile, setPrevFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -23,10 +20,9 @@ function AddSubtitlesToMedia() {
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
   const [subtitleText, setSubtitleText] = useState('')
-  const [fontId, setFontId] = useState(FONT_OPTIONS[0].id)
   const [captionStyleId, setCaptionStyleId] = useState('netflix')
   const [fontScale, setFontScale] = useState(1)
-  const [customFonts, setCustomFonts] = useState<FontOption[]>([])
+
   const [isUploadingFont, setIsUploadingFont] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const fontUploadRef = useRef<HTMLInputElement>(null)
@@ -35,9 +31,6 @@ function AddSubtitlesToMedia() {
   const imageRef = useRef<HTMLImageElement | null>(null)
   const rafRef = useRef<number | null>(null)
   const errorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const allFontOptions = useMemo(() => [...FONT_OPTIONS, ...customFonts], [customFonts])
-  const activeFont = allFontOptions.find((f) => f.id === fontId) ?? FONT_OPTIONS[0]
 
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file])
 
@@ -58,11 +51,6 @@ function AddSubtitlesToMedia() {
     setIsMuted(true)
   }
 
-  useEffect(() => {
-    Promise.all(FONT_OPTIONS.map((f) => document.fonts.load(`${f.weight} 16px "${f.family}"`))).catch(
-      () => {}
-    )
-  }, [])
 
   const renderFrame = useCallback(() => {
     const canvas = canvasRef.current
@@ -78,13 +66,8 @@ function AddSubtitlesToMedia() {
     } else {
       return
     }
-    drawSubtitles(ctx, canvas, {
-      text: subtitleText,
-      font: activeFont,
-      captionStyleId,
-      fontScale,
-    })
-  }, [file, subtitleText, activeFont, captionStyleId, fontScale])
+
+  }, [file])
 
   const renderFrameRef = useRef(renderFrame)
   useEffect(() => {
@@ -165,31 +148,6 @@ function AddSubtitlesToMedia() {
     link.href = canvas.toDataURL('image/png')
     link.click()
   }, [file])
-
-  const handleFontUpload = useCallback(
-    async (files: FileList | null) => {
-      const uploaded = files?.[0]
-      if (!uploaded) return
-      setIsUploadingFont(true)
-      try {
-        const buffer = await uploaded.arrayBuffer()
-        const family = `CustomFont-${customFonts.length}-${uploaded.name.replace(/[^a-zA-Z0-9]/g, '')}`
-        const face = new FontFace(family, buffer)
-        await face.load()
-        document.fonts.add(face)
-        const label = uploaded.name.replace(/\.[^./]+$/, '') || uploaded.name
-        const id = `custom-${family}`
-        setCustomFonts((prev) => [...prev, { id, label, family, weight: 400 }])
-        setFontId(id)
-      } catch {
-        showError('Could not load that font file')
-      } finally {
-        setIsUploadingFont(false)
-        if (fontUploadRef.current) fontUploadRef.current.value = ''
-      }
-    },
-    [customFonts.length, showError]
-  )
 
   const handleFiles = useCallback(
     (files: FileList | null) => {
@@ -317,21 +275,7 @@ function AddSubtitlesToMedia() {
             </div>
             <div className="flex w-full flex-col gap-4 lg:w-80 xl:w-96">
               <p className="truncate px-5 text-sm text-[#5a3d24]/70">{file.name}</p>
-              <SubtitleControlsPanel
-                subtitleText={subtitleText}
-                onSubtitleTextChange={setSubtitleText}
-                captionStyleId={captionStyleId}
-                onCaptionStyleChange={setCaptionStyleId}
-                fontId={fontId}
-                onFontChange={setFontId}
-                fontOptions={allFontOptions}
-                fontScale={fontScale}
-                onFontScaleChange={setFontScale}
-                isUploadingFont={isUploadingFont}
-                onFontUpload={handleFontUpload}
-                fontUploadRef={fontUploadRef}
-                disabled={isExporting}
-              />
+              Hello
               <div className="flex w-full flex-col gap-3">
                 {file.type.startsWith('video/') && (
                   <button
@@ -384,4 +328,4 @@ function AddSubtitlesToMedia() {
   )
 }
 
-export default AddSubtitlesToMedia
+export default ChangeCapture

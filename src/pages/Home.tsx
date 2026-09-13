@@ -1,7 +1,7 @@
 import Tiles from '../components/Tiles'
 
 import { useNavigate } from 'react-router-dom';
-import { Subtitles } from 'lucide-react';
+import { Subtitles, Wind } from 'lucide-react';
 
 export function Home() {
   const navigate = useNavigate();
@@ -32,11 +32,11 @@ export function Home() {
             </button>
 
             <button
-              onClick={() => navigate('/add-subtitles')}
+              onClick={() => navigate('/change-capture')}
               className="group inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#5a3d24] px-5 py-3.5 font-medium text-[#f4e8d7] shadow-lg shadow-[#5a3d24]/20 transition-all duration-200 hover:bg-[#432d1a] hover:shadow-xl active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#5a3d24] focus:ring-offset-2 focus:ring-offset-[#f4e8d7]"
             >
-              <Subtitles className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
-              <span>Add Subtitles to Media</span>
+              <Wind className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
+              <span>change capture</span>
             </button>
           </div>
 
